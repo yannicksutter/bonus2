@@ -3,6 +3,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 
@@ -12,24 +14,32 @@ public class Main {
     private static String init = "0000000";
     private static int pwLength = init.length();
     private static char[] chars = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-
+    private static Map<String, String> rainbowTable = new HashMap<>();
 
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
-        System.out.println("Hello World!");
-        System.out.println(getMD5("0000000"));
-        System.out.println(getReduction(getMD5("0000000"), 0));
         recursiveFillPasswords(init, 1);
         for (String s : passwords) {
             System.out.println(passwords.indexOf(s)+ ": " + s);
         }
         System.out.println(passwords.size());
+
+        //generate rainbow table
+        for(String password : passwords) {
+            String pw = password;
+            for(int i = 0; i < 2000; i++) {
+                pw = getMD5(pw);
+                pw = getReduction(pw, i);
+            }
+            rainbowTable.put(password, pw);
+        }
+
     }
 
     //Creates the first 2000 passwords using lowercase letters and numbers 0...9
     private static void recursiveFillPasswords(String init, int index) {
         for (char c : chars) {
-            if(passwords.size() > 2000) {
+            if(passwords.size() >= 2000) {
                 break;
             }
             init = init.substring(0, index - 1).concat(String.valueOf(c));
@@ -40,8 +50,6 @@ public class Main {
                 passwords.add(init);
             }
         }
-
-
     }
 
     private static String getMD5(String s) throws UnsupportedEncodingException, NoSuchAlgorithmException {
