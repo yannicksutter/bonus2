@@ -5,6 +5,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class Main {
+
+    private static String hashwert = "1d56a37fb6b08aa709fe90e12ca59e12";
     private static int l = 7;
     private static ArrayList<String> passwords = new ArrayList<String>();
     private static String init = "0000000";
@@ -15,8 +17,8 @@ public class Main {
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
         System.out.println("Hello World!");
-        /*System.out.println(getMD5("0000000"));
-        System.out.println(getReduction(getMD5("0000000"), 0));*/
+        System.out.println(getMD5("0000000"));
+        System.out.println(getReduction(getMD5("0000000"), 0));
         recursiveFillPasswords(init, 1);
         for (String s : passwords) {
             System.out.println(passwords.indexOf(s)+ ": " + s);
@@ -42,19 +44,6 @@ public class Main {
 
     }
 
-
-    private static void fillPasswords(int idx) {
-        for (char c : chars) {
-            if (idx < 7) {
-                init = init.substring(0, idx).concat(String.valueOf(c)).concat(init.substring(idx, init.length()));
-                passwords.add(init);
-                fillPasswords(idx + 1);
-            }
-            init = init.substring(0, idx).concat(String.valueOf(c));
-            passwords.add(init);
-        }
-    }
-
     private static String getMD5(String s) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         byte[] bytesOfMessage = s.getBytes("UTF-8");
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -64,15 +53,15 @@ public class Main {
     private static String getReduction(String hash, int step) {
         BigInteger bi = new BigInteger(hash, 16);
         bi.add(BigInteger.valueOf(step));
-        BigInteger[] bis = new BigInteger[chars.length];
+        int anzahlZeichen = chars.length;
+        BigInteger[] bis = new BigInteger[anzahlZeichen];
         for (int i = 0; i < l; i++) {
-            bis[i] = bi.mod(BigInteger.valueOf(chars.length));
-            bi = bi.divide(BigInteger.valueOf(chars.length));
+            bis[i] = bi.mod(BigInteger.valueOf(anzahlZeichen));
+            bi = bi.divide(BigInteger.valueOf(anzahlZeichen));
         }
 
-
         StringBuilder sb = new StringBuilder();
-        for (int x = bis.length - 1; x >= 0; x--) {
+        for (int x = l-1; x >= 0; x--) {
             sb.append(chars[bis[x].intValue()]);
         }
         return sb.toString();
