@@ -12,18 +12,16 @@ public class Main {
     private static int l = 7;
     private static ArrayList<String> passwords = new ArrayList<String>();
     private static String init = "0000000";
-    private static int pwLength = init.length();
     private static char[] chars = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
     private static Map<String, String> rainbowTable = new HashMap<>();
 
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
+        System.out.println("Generiere 2000 Passwörter");
+        //Generate 2000 Passwords
         recursiveFillPasswords(init, 1);
-        /*for (String s : passwords) {
-            System.out.println(passwords.indexOf(s)+ ": " + s);
-        }*/
-        System.out.println("Number of passwords: " + passwords.size());
 
+        System.out.println("Generiere Rainbowtable");
         //generate rainbow table
         for(String password : passwords) {
             String pw = password;
@@ -34,38 +32,39 @@ public class Main {
             rainbowTable.put(password, pw);
         }
 
+        //Finde Startpunkt
+        System.out.println("Finde Startpunkt");
+        String password= "";
         for(int i = 1999; i >=0; i--) {
             String h = makeReductionStep(hashwert, i);
             if(rainbowTable.containsValue(h)){
-                System.out.println("Password: " + getKeyFromValue(rainbowTable, h));
+                password = (String) getKeyFromValue(rainbowTable, h);
                 break;
             }
         }
 
+        //Finde Passwort vor Hash
+        System.out.println("Finde Passwort");
+        for(int i = 0; i < 2000; i++) {
+            if(getMD5(password).equals(hashwert)) {
+                System.out.println("Passwort: " +  password);
+                break;
+            }
+            password = getMD5(password);
+            password = getReduction(password, i);
+        }
 
     }
-
 
     private static String makeReductionStep(String hash, int step) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        if(step % 2 == 0) {
-            hash = getReduction(hash, step);
-            hash = getMD5(hash);
-        } else {
-            hash = getReduction(hash, step);
+        if(step == 1999) {
+            return getReduction(hash, step);
         }
-        if(step < 1999) {
-            hash = makeReductionStep(hash, step+1);
-        }
+        hash = getReduction(hash, step);
+        hash = getMD5(hash);
+        hash = makeReductionStep(hash, step+1);
         return hash;
     }
-
-
-
-
-    private static boolean hasHash(String hash) {
-        return rainbowTable.containsValue(hash);
-    }
-
 
     //Creates the first 2000 passwords using lowercase letters and numbers 0...9
     private static void recursiveFillPasswords(String init, int index) {
@@ -94,7 +93,7 @@ public class Main {
     //returns reduction on given hash and step gemäss folie 3.27
     private static String getReduction(String hash, int step) {
         BigInteger bi = new BigInteger(hash, 16);
-        bi.add(BigInteger.valueOf(step));
+        bi = bi.add(BigInteger.valueOf(step));
         int anzahlZeichen = chars.length;
         BigInteger[] bis = new BigInteger[anzahlZeichen];
         for (int i = 0; i < l; i++) {
@@ -117,6 +116,5 @@ public class Main {
         }
         return null;
     }
-
 
 }
