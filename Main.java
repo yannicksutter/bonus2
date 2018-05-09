@@ -19,10 +19,10 @@ public class Main {
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
         recursiveFillPasswords(init, 1);
-        for (String s : passwords) {
+        /*for (String s : passwords) {
             System.out.println(passwords.indexOf(s)+ ": " + s);
-        }
-        System.out.println(passwords.size());
+        }*/
+        System.out.println("Number of passwords: " + passwords.size());
 
         //generate rainbow table
         for(String password : passwords) {
@@ -35,8 +35,13 @@ public class Main {
         }
 
         for(int i = 1999; i >=0; i--) {
-
+            String h = makeReductionStep(hashwert, i);
+            if(rainbowTable.containsValue(h)){
+                System.out.println("Password: " + getKeyFromValue(rainbowTable, h));
+                break;
+            }
         }
+
 
     }
 
@@ -101,6 +106,16 @@ public class Main {
             sb.append(chars[bis[x].intValue()]);
         }
         return sb.toString();
+    }
+
+    //Gets the key from a value in a hash map
+    public static Object getKeyFromValue(Map hm, Object value) {
+        for (Object o : hm.keySet()) {
+            if (hm.get(o).equals(value)) {
+                return o;
+            }
+        }
+        return null;
     }
 
 
